@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.message.MessageFragment">
+
+    <ImageView
+        android:id="@+id/back_message_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/message_back"
+        android:scaleType="center" />
+
+    <ListView
+        android:id="@+id/message_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_above="@id/area_enter_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="20sp"
+        android:text="Нет приватных чатов"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/area_enter_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/send_message_button"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp">
+
+        <EditText
+            android:id="@+id/message_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_message"
+            android:visibility="gone"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/send_message_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/area_enter_text"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_baseline_send_24"
+        android:visibility="gone"/>
+
+</RelativeLayout>

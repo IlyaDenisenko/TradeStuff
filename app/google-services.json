@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "487551044145",
+    "project_id": "tradestuff-b1fb3",
+    "storage_bucket": "tradestuff-b1fb3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487551044145:android:34eb0eb73608b7a9ade310",
+        "android_client_info": {
+          "package_name": "com.zil.tradestuff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487551044145-584do8238ttd0irkolj5fq2b352u0nn5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFeCJeo7Lb7ITlknTc5mSfgSK5otZszRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487551044145-584do8238ttd0irkolj5fq2b352u0nn5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
