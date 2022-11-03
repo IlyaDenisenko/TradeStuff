@@ -1,12 +1,24 @@
 package com.zil.tradestuff.server
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.zil.tradestuff.model.ThingModel
 
 interface ContractDBInterface {
 
-    fun sendInDB(thingModel: ThingModel)
+    fun insertInDB(thingModel: ThingModel)
 
-    fun getAllFromDB(): List<ThingModel>
+    fun insertAllInDB(listThings: List<ThingModel>)
 
-    fun deleteFromDB(thingModel: ThingModel)
+    fun getAllFromDB(callbackServerData: CallbackServerData):List<ThingModel>
+
+    fun deleteFromDB(thingModel: ThingModel, callbackServerData: CallbackServerData)
+
+    fun deleteFromDBById(id: Int)
+
+    interface CallbackServerData{
+        fun actionAfterComingData()
+    }
+
+
 }

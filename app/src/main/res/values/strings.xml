@@ -3,12 +3,18 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_message">Message</string>
-    <string name="title_my_things">My things</string>
+    <string name="title_message">Messages</string>
+    <string name="title_my_things">Things</string>
     <string name="title_account">My account</string>
+    <string name="title_favorite">Favorite</string>
+    <string name="title_publication">Publication</string>
 
     <string name="button_exit_account">Exit account</string>
+    <string name="button_login_account">Login account</string>
     <string name="button_add_photo_thing">Add photo</string>
-    <string name="describe_thing">Describe the product</string>
+    <string name="describe_thing">Product description</string>
+    <string name="name_thing">Product name</string>
     <string name="button_public_thing">Publish a product</string>
+    <string name="login_or_reg">Login or registration</string>
+
 </resources>

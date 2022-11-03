@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="thing_name_text_size">20sp</dimen>
     <dimen name="size_message_text">18sp</dimen>
+
+    <dimen name="bottom_navigation_view_height">0.085</dimen>
 </resources>

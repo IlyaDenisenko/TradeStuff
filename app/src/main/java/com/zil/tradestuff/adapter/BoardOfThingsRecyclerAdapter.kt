@@ -21,7 +21,7 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
 
 
     interface OnThingClickListener{
-        fun onClick(thingModel: ThingModel, position: Int)
+        fun onClickItem(thingModel: ThingModel, position: Int)
 
         fun onClickDeleteItem(position: Int)
     }
@@ -54,10 +54,10 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
 
         holder.descriptionText?.text = listThings[position].name
         holder.dateText?.text = stringDate
-        val str = listThings[position].images[0].toString().removePrefix("[")
+        val nameImageString = listThings[position].images[0].toString().removePrefix("[")
         if (listThings[position].images.isNotEmpty())
             Glide.with(holder.itemView.context)
-                .load(str.toUri())
+                .load(nameImageString.toUri())
                 .centerCrop()
                 .override(SIZE_ORIGINAL)
                 .error(R.drawable.nofoto)
@@ -69,7 +69,7 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
 
 
         holder.itemView.setOnClickListener{
-            onThingOnClickListener.onClick(thingModel, position)
+            onThingOnClickListener.onClickItem(thingModel, position)
         }
 
         holder.deleteItemBut?.setOnClickListener {

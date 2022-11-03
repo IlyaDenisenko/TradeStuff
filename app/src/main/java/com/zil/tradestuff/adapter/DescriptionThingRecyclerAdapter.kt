@@ -32,7 +32,7 @@ class DescriptionThingRecyclerAdapter(val thing: ThingModel, val id: Int):
         var uri = listUri[position]
         Glide.with(holder.itemView.context)
             .load(uri)
-            .override(SIZE_ORIGINAL)
+           // .override(SIZE_ORIGINAL)
             .error(R.drawable.nofoto)
             .into(holder.photo!!)
 

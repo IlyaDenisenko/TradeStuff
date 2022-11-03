@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_message">
+    app:startDestination="@+id/navigation_dashboard">
 
     <fragment
         android:id="@+id/navigation_message"
@@ -15,11 +15,38 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.zil.tradestuff.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_navigation_dashboard_to_thingFragment"
+            app:destination="@id/thingFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_account"
         android:name="com.zil.tradestuff.ui.account.AccountFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_account" />
+
+    <fragment
+        android:id="@+id/navigation_login"
+        android:name="com.zil.tradestuff.LoginOrRegistrationFragment"
+        android:label="fragment_login_or_registration"
+        tools:layout="@layout/fragment_login_or_registration" />
+
+    <fragment
+        android:id="@+id/navigation_publication"
+        android:name="com.zil.tradestuff.ui.publication.PublicationFragment"
+        android:label="fragment_publication"
+        tools:layout="@layout/fragment_publication" />
+
+    <fragment
+        android:id="@+id/navigation_favorite"
+        android:name="com.zil.tradestuff.ui.favorite.FavoriteFragment"
+        android:label="fragment_favorite"
+        tools:layout="@layout/fragment_favorite"/>
+    <fragment
+        android:id="@+id/thingFragment"
+        android:name="com.zil.tradestuff.ui.ThingFragment"
+        android:label="fragment_thing"
+        tools:layout="@layout/fragment_thing" />
 </navigation>

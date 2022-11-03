@@ -7,7 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.zil.tradestuff.model.ThingModel
 
-@Database(entities = [ThingModel::class], version = 2)
+//@Database(entities = [ThingModel::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getThingDao() : ThingDAO
 

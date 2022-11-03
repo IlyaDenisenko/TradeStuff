@@ -3,12 +3,18 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_message">Сообщение</string>
-    <string name="title_my_things">Мои товары</string>
-    <string name="title_account">Мой аккаунт</string>
+    <string name="title_message">Сообщения</string>
+    <string name="title_my_things">Товары</string>
+    <string name="title_account">Профиль</string>
+    <string name="title_favorite">Избранное</string>
+    <string name="title_publication">Объявление</string>
 
     <string name="button_exit_account">Выйти с аккаунта</string>
+    <string name="button_login_account">Войти или зарегистрироваться</string>
     <string name="button_add_photo_thing">Добавить фото</string>
     <string name="describe_thing">Описание товара</string>
+    <string name="name_thing">Имя товара</string>
     <string name="button_public_thing">Опубликовать товар</string>
+    <string name="login_or_reg">Войдите или зарегистрируйтесь</string>
+
 </resources>

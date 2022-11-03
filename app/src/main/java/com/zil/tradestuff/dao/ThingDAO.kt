@@ -1,6 +1,7 @@
 package com.zil.tradestuff.dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.zil.tradestuff.model.ThingModel
 
@@ -20,7 +21,7 @@ interface ThingDAO {
     fun deleteThingById(id: Int)
 
     @Query("SELECT * FROM ${ThingModel.TABLE_NAME}")
-    fun getAllThings() : LiveData<List<ThingModel>>
+    fun getAllThings() : List<ThingModel>
 
     @Query("SELECT * FROM ${ThingModel.TABLE_NAME} WHERE thingId == :id")
     fun getThingById(id : Int) : LiveData<ThingModel>

@@ -22,8 +22,6 @@
             android:id="@+id/image_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:src="@drawable/nofoto"/>

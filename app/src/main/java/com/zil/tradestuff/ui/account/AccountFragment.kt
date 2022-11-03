@@ -32,7 +32,7 @@ class AccountFragment : Fragment() {
 
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
         val root: View = binding.root
-       // pressedSignOut(this)
+        pressedSignOut(this)
         return root
     }
 

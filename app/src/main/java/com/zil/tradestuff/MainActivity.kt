@@ -8,10 +8,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationBarView
@@ -19,19 +22,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.zil.tradestuff.databinding.ActivityMainBinding
 import com.zil.tradestuff.model.ThingViewModel
-import com.zil.tradestuff.ui.account.AccountFragment
-import com.zil.tradestuff.ui.dashboard.DashboardFragment
-import com.zil.tradestuff.ui.message.MessageFragment
 import com.zil.tradestuff.ui.publication.PublicationFragment
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener{
+class MainActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityMainBinding
     var fragment : PublicationFragment = PublicationFragment()
+
+    lateinit var botNavView: BottomNavigationView
     lateinit var thingViewModel: ThingViewModel
     lateinit var auth: FirebaseAuth
     companion object{
         var firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        lateinit var navController: NavController
     }
 
 
@@ -60,55 +63,35 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navView: BottomNavigationView = binding.navView
+        botNavView = binding.bottomNavView
         auth = FirebaseAuth.getInstance()
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        val navController = navHostFragment.findNavController()
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        /*val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                    R.id.navigation_dashboard, R.id.navigation_message, R.id.navigation_notifications
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)*/
-        navView.setupWithNavController(navController)
+        navController = navHostFragment.findNavController()
 
-        navView.background = null
+        botNavView.setupWithNavController(navController)
         checkAuth()
-
-       // val appDatabase = Room.databaseBuilder(this, AppDatabase::class.java, "DB").build()
+        onNavigationBottomItemSelect()
     }
 
-    fun loadFragmentInBottomNavigationView(fragment: Fragment?) : Boolean{
-        if (fragment != null){
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment_activity_main, fragment)
-                .commit()
+    fun navigationOption(): NavOptions{
+        val option: NavOptions = NavOptions.Builder()
+            .build()
+        return option
+    }
+
+    fun onNavigationBottomItemSelect(){
+        botNavView.setOnItemSelectedListener {
+            navController.navigate(it.itemId, null, navigationOption())
+            return@setOnItemSelectedListener true
         }
-        return true
     }
 
     fun checkAuth(){
         if (auth.currentUser == null){
-            authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
+          //  authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
         } else{
             Toast.makeText(this, "Welcome " + auth.currentUser?.displayName, Toast.LENGTH_LONG).show()
         }
     }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-
-        var fragment: Fragment? = null
-
-        when(item.itemId){
-            R.id.navigation_dashboard -> fragment = DashboardFragment()
-            R.id.navigation_message -> fragment =  MessageFragment()
-            R.id.navigation_account -> fragment = AccountFragment()
-        }
-        return loadFragmentInBottomNavigationView(fragment)
-    }
-
-
 }

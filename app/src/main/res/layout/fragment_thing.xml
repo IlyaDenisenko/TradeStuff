@@ -7,11 +7,12 @@
     tools:context=".ui.ThingFragment">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/size_message_text"
-        android:layout_marginStart="10dp"/>
+        android:layout_marginStart="10dp"
+        android:text="Example"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photo_recycler_view"

@@ -14,12 +14,19 @@ class ImagesConverter {
     companion object{
 
         fun fromUriToString(imagesUri: List<Uri>): List<String>{
-            val imagesStr : MutableList<String> = mutableListOf()
+            var imagesStr : MutableList<String> = mutableListOf()
             for (n in imagesUri.indices){
                 Log.i("size images: ", imagesStr.size.toString())
                 imagesStr.add(n, imagesUri[n].toString())
             }
             return imagesStr
+        }
+
+        fun fromStringToUri(imagesString: List<String>): List<Uri>{
+            val listImageUri: MutableList<Uri> = mutableListOf()
+            for (n in imagesString.indices)
+                listImageUri.add(n, imagesString[n].toUri())
+            return listImageUri
         }
 
         @TypeConverter
