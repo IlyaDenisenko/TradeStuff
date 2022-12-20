@@ -3,35 +3,41 @@ package com.zil.tradestuff
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.firebase.ui.auth.AuthUI
-import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.zil.tradestuff.databinding.ActivityMainBinding
 import com.zil.tradestuff.model.ThingViewModel
+import com.zil.tradestuff.ui.account.AccountFragment
+import com.zil.tradestuff.ui.dashboard.DashboardFragment
+import com.zil.tradestuff.ui.favorite.FavoriteFragment
+import com.zil.tradestuff.ui.message.MessageFragment
 import com.zil.tradestuff.ui.publication.PublicationFragment
+import io.grpc.internal.MessageFramer
 
 class MainActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityMainBinding
-    var fragment : PublicationFragment = PublicationFragment()
+    lateinit var fragment : Fragment
 
-    lateinit var botNavView: BottomNavigationView
-    lateinit var thingViewModel: ThingViewModel
-    lateinit var auth: FirebaseAuth
+    private lateinit var botNavView: BottomNavigationView
+    private lateinit var thingViewModel: ThingViewModel
+    private lateinit var auth: FirebaseAuth
+    private var itemId: Int = 0
+    private lateinit var backStackEntry: NavBackStackEntry
     companion object{
         var firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
         lateinit var navController: NavController
@@ -70,26 +76,80 @@ class MainActivity : AppCompatActivity(){
         navController = navHostFragment.findNavController()
 
         botNavView.setupWithNavController(navController)
-        checkAuth()
+      //  checkAuth()
         onNavigationBottomItemSelect()
     }
 
-    fun navigationOption(): NavOptions{
-        val option: NavOptions = NavOptions.Builder()
+    private fun navigationOption(): NavOptions {
+        return NavOptions.Builder()
+            .setRestoreState(false)
             .build()
-        return option
+    }
+    private lateinit var previousFragment : Fragment
+
+    private fun replaceFragment(fragment: Fragment){
+        val manager = supportFragmentManager
+        manager.beginTransaction()
+            .replace(R.id.nav_host_fragment_activity_main, fragment)
+            .addToBackStack(null)
+            .commit()
+        previousFragment = fragment
+
     }
 
-    fun onNavigationBottomItemSelect(){
+    private fun onNavigationBottomItemSelect(){
+        val backQueue = navController.backQueue
+
         botNavView.setOnItemSelectedListener {
-            navController.navigate(it.itemId, null, navigationOption())
+            itemId = it.itemId
+            try {
+                backStackEntry = navController.getBackStackEntry(itemId)
+                navController.navigate(itemId, null, navigationOption())
+
+                    if (!backQueue.contains(backStackEntry)){
+                        return@setOnItemSelectedListener true
+                    }
+                    else{
+                        backQueue.remove(backStackEntry)
+                        supportFragmentManager.findFragmentById(itemId)
+                            ?.let { it1 -> supportFragmentManager.beginTransaction().remove(it1) }
+                        Log.i("marco", supportFragmentManager.backStackEntryCount.toString())
+                    }
+
+            } catch (e: IllegalArgumentException) {
+                navController.navigate(itemId, null, navigationOption())
+            }
+            for (i in 1..backQueue.size )
+                Log.i("legend", backQueue[i-1].destination.displayName)
+
+            /*when(it.itemId){
+                R.id.navigation_dashboard -> replaceFragment(DashboardFragment())
+                R.id.navigation_favorite -> replaceFragment(FavoriteFragment())
+                R.id.navigation_publication -> replaceFragment(PublicationFragment())
+                R.id.navigation_message -> replaceFragment(MessageFragment())
+                R.id.navigation_account -> replaceFragment(AccountFragment())
+            }*/
             return@setOnItemSelectedListener true
         }
     }
 
-    fun checkAuth(){
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        try{
+//            backStackEntry = navController.getBackStackEntry(itemId)
+//            navController.backQueue.remove(backStackEntry)
+//            Toast.makeText(this, "work", Toast.LENGTH_SHORT).show()
+//        }
+//        catch (e: IllegalArgumentException){
+//            Toast.makeText(this, "don't work", Toast.LENGTH_SHORT).show() }
+        if (navController.backQueue.size == 1){
+            finish()
+        }
+    }
+
+    private fun checkAuth(){
         if (auth.currentUser == null){
-          //  authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
+            authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
         } else{
             Toast.makeText(this, "Welcome " + auth.currentUser?.displayName, Toast.LENGTH_LONG).show()
         }

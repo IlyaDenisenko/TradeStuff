@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import com.firebase.ui.database.FirebaseListAdapter
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +26,7 @@ class MessageFragment :  Fragment() {
     private var _binding: FragmentMessageBinding? = null
     private var time : Long = 0
     var userName = FirebaseAuth.getInstance().currentUser
+    private lateinit var fragmentContainerView: FragmentContainerView
 
 
     // This property is only valid between onCreateView and
@@ -58,6 +60,15 @@ class MessageFragment :  Fragment() {
         })*/
         initAdapterMyMessages()
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fragmentContainerView = binding.fragmentMessageContainer
+
+        if (FirebaseAuth.getInstance().currentUser == null)
+            fragmentContainerView.visibility = View.VISIBLE
+        else fragmentContainerView.visibility = View.GONE
     }
 
     fun initAdapterMyMessages(){

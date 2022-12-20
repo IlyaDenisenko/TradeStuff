@@ -14,9 +14,8 @@ class ImagesConverter {
     companion object{
 
         fun fromUriToString(imagesUri: List<Uri>): List<String>{
-            var imagesStr : MutableList<String> = mutableListOf()
+            val imagesStr : MutableList<String> = mutableListOf()
             for (n in imagesUri.indices){
-                Log.i("size images: ", imagesStr.size.toString())
                 imagesStr.add(n, imagesUri[n].toString())
             }
             return imagesStr

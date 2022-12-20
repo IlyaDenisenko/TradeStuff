@@ -6,11 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.zil.tradestuff.model.ThingModel
 import com.zil.tradestuff.server.ContractDBInterface
-import com.zil.tradestuff.server.InteractionFirebase
+import com.zil.tradestuff.server.InteractionFirebaseFirestore
 
 class DashboardViewModel : ViewModel() {
 
-    var contractDBInterface = InteractionFirebase()
+    var contractDBInterface = InteractionFirebaseFirestore()
     private var liveData: MutableLiveData<List<ThingModel>> = MutableLiveData()
 
     fun allThingLiveData(callbackServerData: ContractDBInterface.CallbackServerData): LiveData<List<ThingModel>> {

@@ -1,7 +1,5 @@
 package com.zil.tradestuff.server
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.zil.tradestuff.model.ThingModel
 
 interface ContractDBInterface {
@@ -12,9 +10,11 @@ interface ContractDBInterface {
 
     fun getAllFromDB(callbackServerData: CallbackServerData):List<ThingModel>
 
+    fun getThingsByUserFromDB(userId: String, callbackServerData: CallbackServerData): List<ThingModel>
+
     fun deleteFromDB(thingModel: ThingModel, callbackServerData: CallbackServerData)
 
-    fun deleteFromDBById(id: Int)
+    fun deleteByIdFromDB(id: Int)
 
     interface CallbackServerData{
         fun actionAfterComingData()

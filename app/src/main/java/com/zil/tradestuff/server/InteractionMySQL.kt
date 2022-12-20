@@ -24,11 +24,15 @@ class InteractionMySQL(context: Context): ContractDBInterface {
 
     }
 
+    override fun getThingsByUserFromDB(userId: String, callbackServerData: ContractDBInterface.CallbackServerData): List<ThingModel> {
+        TODO("Not yet implemented")
+    }
+
     override fun deleteFromDB(thingModel: ThingModel, callbackServerData: ContractDBInterface.CallbackServerData) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteFromDBById(id: Int) {
+    override fun deleteByIdFromDB(id: Int) {
         database.getThingDao().deleteThingById(id)
     }
 }

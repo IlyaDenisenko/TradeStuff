@@ -1,5 +1,6 @@
 package com.zil.tradestuff.ui
 
+import android.app.Activity
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -7,9 +8,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.zil.tradestuff.LoadingDialog
+import com.zil.tradestuff.MainActivity
 import com.zil.tradestuff.adapter.DescriptionThingRecyclerAdapter
 import com.zil.tradestuff.databinding.FragmentThingBinding
 import com.zil.tradestuff.model.ThingModel
@@ -22,12 +27,22 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
     private var _binding: FragmentThingBinding? = null
     private val binding get() = _binding!!
     private lateinit var nameTextView: TextView
+    private lateinit var descTextView: TextView
+    private lateinit var progressBar: ProgressBar
 
     var idThing = 1
-    var nameThing = ""
+    var userSelectedThing = ""
     lateinit var listThing: List<ThingModel>
-    lateinit var thing: ThingModel
+    var thing: ThingModel = ThingModel()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parentFragmentManager.setFragmentResultListener("selectedItem", this){
+                key, bundle ->
+            userSelectedThing = bundle.getString("userSelectedThing")!!
+            idThing = bundle.getInt("idSelectedThing")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentThingBinding.inflate(inflater, container, false)
@@ -39,19 +54,19 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(ThingViewModel::class.java)
         nameTextView = binding.nameTextView
+        descTextView = binding.descriptionTextView
+        progressBar = binding.progressBar
 
-        setFragmentResultListener("selectedItem"){
-                key, bundle -> idThing = bundle.getInt("idSelectedThing")
-        }
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
         getDataFromLiveData()
     }
 
     fun getDataFromLiveData(){
-        viewModel.allThingLiveData(this).observe(viewLifecycleOwner) {
-                things ->
-            Log.i("gruff", "ThingFragment: " + things.toString())
-            listThing = things
-        }
+        listThing = viewModel.getThingsByUser(userSelectedThing, this)
     }
 
     fun initRecycler(thing: ThingModel){
@@ -61,9 +76,10 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
     }
 
     override fun actionAfterComingData() {
+        progressBar.visibility = View.GONE
         thing = listThing.find { it.id == idThing }!!
-        nameThing = thing.name
-        Log.i("gruff", "ThingFragmentName: " + thing.name + idThing)
+        nameTextView.text = thing.name
+        descTextView.text = thing.description
         initRecycler(thing)
     }
 

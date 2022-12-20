@@ -16,11 +16,13 @@ import java.util.*
 data class ThingModel(
  //   @PrimaryKey(autoGenerate = true)
    //                   @ColumnInfo(name = "thingId")
-    val id: Int = 2,
+    val id: Int,
     //@ColumnInfo(name = "thingImages")
+    val userId: String?,
     val images: List<String>,
   //  @ColumnInfo(name = "thingName")
     val name: String,
+    val description: String,
    // @ColumnInfo(name = "thingDate")
     val date: Date
 ){
@@ -28,5 +30,5 @@ data class ThingModel(
         const val TABLE_NAME = "things_table"
         const val DATABASE_THINGS_NAME = "database_things"
     }
-    constructor() : this(0, listOf(), "", Date())
+    constructor() : this(0, "user", listOf(), "Name","Description",  Date())
 }

@@ -25,7 +25,7 @@ class DescriptionThingRecyclerAdapter(val thing: ThingModel, val id: Int):
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_description_thing, parent, false)
         return MyHolder(itemView)
     }
-
+// TODO (Проверять наличие фото в телефоне. Да(выгружать с телефона - Нет(выгружать из storage))
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         Log.i("Description Adapter: ", thing.toString())
         val listUri = thing.images
@@ -35,8 +35,6 @@ class DescriptionThingRecyclerAdapter(val thing: ThingModel, val id: Int):
            // .override(SIZE_ORIGINAL)
             .error(R.drawable.nofoto)
             .into(holder.photo!!)
-
-
     }
 
     override fun getItemCount(): Int {

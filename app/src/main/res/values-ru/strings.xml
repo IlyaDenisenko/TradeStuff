@@ -16,5 +16,6 @@
     <string name="name_thing">Имя товара</string>
     <string name="button_public_thing">Опубликовать товар</string>
     <string name="login_or_reg">Войдите или зарегистрируйтесь</string>
+    <string name="button_write_message">Написать</string>
 
 </resources>

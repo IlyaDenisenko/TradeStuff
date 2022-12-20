@@ -4,17 +4,22 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.fragment.app.FragmentContainer
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.zil.tradestuff.MainActivity
 import com.zil.tradestuff.R
 import com.zil.tradestuff.TakePicsFromGalleryContract
 import com.zil.tradestuff.adapter.PhotoPublicationRecyclerAdapter
@@ -22,7 +27,7 @@ import com.zil.tradestuff.dao.ImagesConverter
 import com.zil.tradestuff.databinding.FragmentPublicationBinding
 import com.zil.tradestuff.model.ThingModel
 import com.zil.tradestuff.model.ThingViewModel
-import com.zil.tradestuff.ui.dashboard.DashboardFragment
+import java.io.File
 import java.util.*
 
 class PublicationFragment : Fragment() {
@@ -36,7 +41,10 @@ class PublicationFragment : Fragment() {
     lateinit var uri : Uri
     lateinit var thingModel : ThingModel
     lateinit var storageReference: StorageReference
+    lateinit var firebaseAuth: FirebaseAuth
 
+    lateinit var fragmentContainer: FragmentContainerView
+    lateinit var nameEditText: EditText
     lateinit var descriptionEditText: EditText
     lateinit var addPhotoButton: Button
     lateinit var publishButton: Button
@@ -46,8 +54,8 @@ class PublicationFragment : Fragment() {
 
         val count = result?.clipData?.itemCount
         if(count != null) {
-            for (n in 0 until count!! ) {
-                uri = result?.clipData!!.getItemAt(n).uri
+            for (n in 0 until count ) {
+                uri = result.clipData!!.getItemAt(n).uri
                 listPhotoUri.add(uri)
             }
             initRecyclerPhoto(listPhotoUri)
@@ -60,10 +68,15 @@ class PublicationFragment : Fragment() {
     ): View {
         _binding = FragmentPublicationBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        val storage = FirebaseStorage.getInstance()
-        storageReference = storage.getReferenceFromUrl("gs://tradestuff-b1fb3.appspot.com")
         return root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        firebaseAuth = FirebaseAuth.getInstance()
+        val storage = FirebaseStorage.getInstance()
+        storageReference = storage.getReference("photo_thing").child(firebaseAuth.uid!!)
+        Log.i("marco", "pub onCreate")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,10 +84,15 @@ class PublicationFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(PublicationViewModel::class.java)
         thingViewModel = ViewModelProvider(this).get(ThingViewModel::class.java)
 
-        descriptionEditText = binding.nameEditText
+        fragmentContainer = binding.fragmentContainer
+        nameEditText = binding.nameEditText
+        descriptionEditText = binding.descriptionEditText
         addPhotoButton = binding.addPhotoImage
         publishButton = binding.publicationButton
 
+        if (firebaseAuth.currentUser == null)
+            fragmentContainer.visibility = View.VISIBLE
+        else fragmentContainer.visibility = View.GONE
         clickAddPhoto()
         clickPublishThing()
     }
@@ -102,22 +120,47 @@ class PublicationFragment : Fragment() {
    }
 
     private fun clickPublishThing() {
+        val firebaseAuthId = firebaseAuth.uid
         publishButton.setOnClickListener() {
-            val name = descriptionEditText.text.toString()
+            val name = nameEditText.text.toString()
+            val description = descriptionEditText.text.toString()
             val date = Date()
+            val imagesName: MutableList<String> = mutableListOf()
+            for(n in 0 until listPhotoUri.size)
+                imagesName.add(n,File(listPhotoUri[n].path.toString()).name )
 
-            thingModel = ThingModel(images = ImagesConverter.fromUriToString(listPhotoUri), name =  name, date = date)
+            thingModel = ThingModel(
+                id = kotlin.random.Random.nextInt(1, 100),
+                userId = firebaseAuthId,
+              //  images = imagesName,
+                images = ImagesConverter.fromUriToString(listPhotoUri),
+                name =  name,
+                description = description,
+                date = date)
 
-            FirebaseFirestore.getInstance()
-                .collection("Publication").document(FirebaseAuth.getInstance().uid!!).collection("Things").document(thingModel.name)
-                .set(thingModel)
-            parentFragmentManager.beginTransaction()
+            thingViewModel.insertThing(thingModel)
+
+            for (n in 0 until thingModel.images.size){
+                storageReference.child(thingModel.name)
+                    /*.child(imagesName[n])
+                    .putFile(listPhotoUri[n])*/
+                    .child(File(ImagesConverter.fromStringToUri(thingModel.images)[n].path.toString()).name)
+                    .putFile(ImagesConverter.fromStringToUri(thingModel.images)[n])
+            }
+            MainActivity.navController.navigate(R.id.navigation_dashboard)
+            MainActivity.navController.backQueue.remove(MainActivity.navController.getBackStackEntry(R.id.navigation_publication))
+            /*parentFragmentManager.beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_main, DashboardFragment())
-                .commit()
+                .commit()*/
         }
        }
 
     fun backButtonPressed(){
         childFragmentManager.beginTransaction().remove(this).commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("marco", "pub onDestroy")
     }
 }

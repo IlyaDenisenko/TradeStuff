@@ -1,6 +1,7 @@
 package com.zil.tradestuff.ui.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ class DashboardFragment : Fragment(), OnThingClickListener, ContractDBInterface.
     private lateinit var swipeLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var floatingBut : FloatingActionButton
+
     private var idSelectedThing = 0
     lateinit var listThings: List<ThingModel>
 
@@ -47,6 +49,11 @@ class DashboardFragment : Fragment(), OnThingClickListener, ContractDBInterface.
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
         return root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.i("marco", "dash onCreate")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +75,6 @@ class DashboardFragment : Fragment(), OnThingClickListener, ContractDBInterface.
             getDataFromLiveData()
             Toast.makeText(context, "refreshed", Toast.LENGTH_SHORT).show()
             swipeLayout.isRefreshing = false
-
         }
     }
 
@@ -82,7 +88,6 @@ class DashboardFragment : Fragment(), OnThingClickListener, ContractDBInterface.
                 things ->
             listThings = things
         }
-
     }
 
     private fun clickFloatingBut(){
@@ -95,23 +100,26 @@ class DashboardFragment : Fragment(), OnThingClickListener, ContractDBInterface.
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onStart() {
+        super.onStart()
+        Log.i("marco", "dash onStart")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("marco", "dash onDestroy")
         _binding = null
     }
 
     override fun onClickItem(thingModel: ThingModel, position: Int) {
         val nav = MainActivity.navController
-        val fragmentTransaction = parentFragmentManager.beginTransaction()
+
         idSelectedThing = listThings[position].id
         parentFragmentManager.setFragmentResult("selectedItem", bundleOf(
-            "idSelectedThing" to idSelectedThing,
-            "nameSelectedThing" to listThings[position].name))
+            "userSelectedThing" to listThings[position].userId,
+            "idSelectedThing" to idSelectedThing))
+
         nav.navigate(R.id.thingFragment)
-        /*fragmentTransaction
-            .replace(R.id.nav_host_fragment_activity_main, ThingFragment())
-            .addToBackStack("dashboardStack")
-            .commit()*/
     }
 
     override fun onClickDeleteItem(position: Int){

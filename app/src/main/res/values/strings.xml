@@ -16,5 +16,6 @@
     <string name="name_thing">Product name</string>
     <string name="button_public_thing">Publish a product</string>
     <string name="login_or_reg">Login or registration</string>
+    <string name="button_write_message">Write message</string>
 
 </resources>

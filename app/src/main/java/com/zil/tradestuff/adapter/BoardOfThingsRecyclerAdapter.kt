@@ -1,20 +1,29 @@
 package com.zil.tradestuff.adapter
 
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
+import com.google.firebase.storage.FirebaseStorage
 
 import com.zil.tradestuff.R
+import com.zil.tradestuff.dao.ImagesConverter
 import com.zil.tradestuff.model.ThingModel
+import kotlinx.coroutines.*
+import java.io.File
 import java.text.SimpleDateFormat
+import kotlin.coroutines.coroutineContext
 
 class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingClickListener: OnThingClickListener):
     RecyclerView.Adapter<BoardOfThingsRecyclerAdapter.MyViewHolder>(){
@@ -27,16 +36,19 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
     }
 
     var onThingOnClickListener: OnThingClickListener = onThingClickListener
+    val storage = FirebaseStorage.getInstance()
+    val SIX_MEGABYTES: Long = (1024 * 1024) * 6
+    val myCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         var photoImage : ImageView? = null
-        var descriptionText : TextView? = null
+        var nameText : TextView? = null
         var dateText : TextView? = null
         var deleteItemBut: ImageButton? = null
 
         init {
             photoImage = itemView.findViewById(R.id.image_photo)
-            descriptionText = itemView.findViewById(R.id.description_thing)
+            nameText = itemView.findViewById(R.id.description_thing)
             dateText = itemView.findViewById(R.id.date_thing)
             deleteItemBut = itemView.findViewById(R.id.delete_item_button)
         }
@@ -46,26 +58,49 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_board_of_thing, parent, false)
         return MyViewHolder(itemView)
     }
-
+// TODO (Проверять наличие фото в телефоне. Да(выгружать с телефона - Нет(выгружать из storage))
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val thingModel = listThings[position]
         val dateFormat = SimpleDateFormat("dd-MM-yyyy hh:mm")
         val stringDate = dateFormat.format(listThings[position].date)
+        var bitmap: Bitmap
 
-        holder.descriptionText?.text = listThings[position].name
+        myCoroutineScope.launch(Dispatchers.Main) {
+
+            val def = async(Dispatchers.IO) {
+                storage
+                    .getReference("photo_thing")
+                    .child(thingModel.userId.toString())
+                    .child(thingModel.name)
+                    .child(File(ImagesConverter.fromStringToUri(thingModel.images)[0].path.toString()).name)
+                    .getBytes(SIX_MEGABYTES)
+
+            }
+            def.await().addOnSuccessListener {
+                bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                if (listThings[position].images.isNotEmpty())
+                    Glide.with(holder.itemView.context)
+                        .load(bitmap)
+                        .centerCrop()
+                        .override(SIZE_ORIGINAL)
+                        .error(R.drawable.nofoto)
+                        .into(holder.photoImage!!)
+                else
+                    Glide.with(holder.itemView.context)
+                        .load(R.drawable.nofoto)
+                        .into(holder.photoImage!!)
+
+            }
+
+
+            }
+
+
+
+        holder.nameText?.text = listThings[position].name
         holder.dateText?.text = stringDate
-        val nameImageString = listThings[position].images[0].toString().removePrefix("[")
-        if (listThings[position].images.isNotEmpty())
-            Glide.with(holder.itemView.context)
-                .load(nameImageString.toUri())
-                .centerCrop()
-                .override(SIZE_ORIGINAL)
-                .error(R.drawable.nofoto)
-                .into(holder.photoImage!!)
-        else
-            Glide.with(holder.itemView.context)
-                .load(R.drawable.nofoto)
-                .into(holder.photoImage!!)
+        val nameImageString = listThings[position].images[0].removePrefix("[")
+
 
 
         holder.itemView.setOnClickListener{
