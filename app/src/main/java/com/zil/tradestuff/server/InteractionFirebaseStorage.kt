@@ -1,17 +1,22 @@
 package com.zil.tradestuff.server
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.zil.tradestuff.common.MyApp
+import com.zil.tradestuff.dao.ImagesConverter
 import com.zil.tradestuff.model.ThingModel
+import java.io.File
 
 class InteractionFirebaseStorage: ContractDBInterface {
 
-    val firebaseAuth = FirebaseAuth.getInstance()
     val firebaseStorage = FirebaseStorage.getInstance()
-    val storageReference = firebaseStorage.getReference("photo_thing").child(firebaseAuth.uid!!)
+    val storageReference = firebaseStorage.getReference("photo_thing").child(MyApp.getFirebaseAuth().uid!!)
 
     override fun insertInDB(thingModel: ThingModel) {
-        TODO("Not yet implemented")
+        for (n in 0 until thingModel.images.size) {
+            storageReference.child(thingModel.name)
+                .child(File(ImagesConverter.fromStringToUri(thingModel.images)[n].path.toString()).name)
+                .putFile(ImagesConverter.fromStringToUri(thingModel.images)[n])
+        }
     }
 
     override fun insertAllInDB(listThings: List<ThingModel>) {
@@ -29,11 +34,12 @@ class InteractionFirebaseStorage: ContractDBInterface {
         TODO("Not yet implemented")
     }
 
-    override fun deleteFromDB(
-        thingModel: ThingModel,
-        callbackServerData: ContractDBInterface.CallbackServerData
-    ) {
-        TODO("Not yet implemented")
+    override fun deleteFromDB(thingModel: ThingModel) {
+        for (n in 0 until thingModel.images.size) {
+            storageReference.child(thingModel.name)
+                .child(File(ImagesConverter.fromStringToUri(thingModel.images)[n].path.toString()).name)
+                .delete()
+        }
     }
 
     override fun deleteByIdFromDB(id: Int) {

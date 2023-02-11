@@ -1,21 +1,19 @@
 package com.zil.tradestuff.ui
 
-import android.app.Activity
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.zil.tradestuff.LoadingDialog
 import com.zil.tradestuff.MainActivity
+import com.zil.tradestuff.R
 import com.zil.tradestuff.adapter.DescriptionThingRecyclerAdapter
+import com.zil.tradestuff.common.MyApp
 import com.zil.tradestuff.databinding.FragmentThingBinding
 import com.zil.tradestuff.model.ThingModel
 import com.zil.tradestuff.model.ThingViewModel
@@ -28,7 +26,9 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
     private val binding get() = _binding!!
     private lateinit var nameTextView: TextView
     private lateinit var descTextView: TextView
+    private lateinit var userNameTextView: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var deleteButton: Button
 
     var idThing = 1
     var userSelectedThing = ""
@@ -55,9 +55,12 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
         viewModel = ViewModelProvider(this).get(ThingViewModel::class.java)
         nameTextView = binding.nameTextView
         descTextView = binding.descriptionTextView
+        userNameTextView = binding.userName
         progressBar = binding.progressBar
+        deleteButton = binding.butDeleteThing
 
         progressBar.visibility = View.VISIBLE
+        clickDeleteButton()
     }
 
     override fun onResume() {
@@ -78,9 +81,23 @@ class ThingFragment : Fragment(), ContractDBInterface.CallbackServerData {
     override fun actionAfterComingData() {
         progressBar.visibility = View.GONE
         thing = listThing.find { it.id == idThing }!!
+
+        if (MyApp.getFirebaseAuth().uid == thing.userId)
+            deleteButton.visibility = View.VISIBLE
         nameTextView.text = thing.name
         descTextView.text = thing.description
+        userNameTextView.text = thing.userName
         initRecycler(thing)
+    }
+
+    fun clickDeleteButton(){
+        deleteButton.setOnClickListener {
+            viewModel.deleteThing(thing)
+            MainActivity.navController.navigate(R.id.navigation_dashboard)
+            MainActivity.navController.backQueue.remove(
+                MainActivity.navController.getBackStackEntry(
+                    R.id.thingFragment))
+        }
     }
 
 }

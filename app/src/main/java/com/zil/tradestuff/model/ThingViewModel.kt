@@ -7,10 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.zil.tradestuff.server.ContractDBInterface
 import com.zil.tradestuff.server.InteractionFirebaseFirestore
+import com.zil.tradestuff.server.InteractionFirebaseStorage
 
 class ThingViewModel(application: Application) : AndroidViewModel(application) {
 
     var contractDBInterface = InteractionFirebaseFirestore()
+    val connectorFirebaseStorage = InteractionFirebaseStorage()
     private var liveData: MutableLiveData<List<ThingModel>> = MutableLiveData()
 
    // private val database : AppDatabase = AppDatabase.getInstance(application)
@@ -25,6 +27,7 @@ class ThingViewModel(application: Application) : AndroidViewModel(application) {
 
     fun insertThing(thing: ThingModel){
         contractDBInterface.insertInDB(thing)
+        connectorFirebaseStorage.insertInDB(thing)
       //  database.getThingDao().insertThing(thing)
     }
 
@@ -32,7 +35,8 @@ class ThingViewModel(application: Application) : AndroidViewModel(application) {
         return contractDBInterface.getThingsByUserFromDB(userId, callbackServerData)
     }
 
-    fun deleteThing(thing: ThingModel, callbackServerData: ContractDBInterface.CallbackServerData){
-      contractDBInterface.deleteFromDB(thing, callbackServerData)
+    fun deleteThing(thing: ThingModel){
+        contractDBInterface.deleteFromDB(thing)
+        connectorFirebaseStorage.deleteFromDB(thing)
     }
 }

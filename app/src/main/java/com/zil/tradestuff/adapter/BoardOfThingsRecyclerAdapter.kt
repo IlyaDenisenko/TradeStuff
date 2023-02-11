@@ -3,19 +3,16 @@ package com.zil.tradestuff.adapter
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.google.firebase.storage.FirebaseStorage
+import com.zil.tradestuff.MainActivity
 
 import com.zil.tradestuff.R
 import com.zil.tradestuff.dao.ImagesConverter
@@ -23,7 +20,6 @@ import com.zil.tradestuff.model.ThingModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
-import kotlin.coroutines.coroutineContext
 
 class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingClickListener: OnThingClickListener):
     RecyclerView.Adapter<BoardOfThingsRecyclerAdapter.MyViewHolder>(){
@@ -31,12 +27,9 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
 
     interface OnThingClickListener{
         fun onClickItem(thingModel: ThingModel, position: Int)
-
-        fun onClickDeleteItem(position: Int)
     }
 
     var onThingOnClickListener: OnThingClickListener = onThingClickListener
-    val storage = FirebaseStorage.getInstance()
     val SIX_MEGABYTES: Long = (1024 * 1024) * 6
     val myCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -44,13 +37,11 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
         var photoImage : ImageView? = null
         var nameText : TextView? = null
         var dateText : TextView? = null
-        var deleteItemBut: ImageButton? = null
 
         init {
             photoImage = itemView.findViewById(R.id.image_photo)
             nameText = itemView.findViewById(R.id.description_thing)
             dateText = itemView.findViewById(R.id.date_thing)
-            deleteItemBut = itemView.findViewById(R.id.delete_item_button)
         }
     }
 
@@ -68,7 +59,7 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
         myCoroutineScope.launch(Dispatchers.Main) {
 
             val def = async(Dispatchers.IO) {
-                storage
+                MainActivity.SingletonFirebaseStorage.getFirebaseStorage
                     .getReference("photo_thing")
                     .child(thingModel.userId.toString())
                     .child(thingModel.name)
@@ -89,10 +80,7 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
                     Glide.with(holder.itemView.context)
                         .load(R.drawable.nofoto)
                         .into(holder.photoImage!!)
-
             }
-
-
             }
 
 
@@ -107,9 +95,7 @@ class BoardOfThingsRecyclerAdapter(val listThings : List<ThingModel>, onThingCli
             onThingOnClickListener.onClickItem(thingModel, position)
         }
 
-        holder.deleteItemBut?.setOnClickListener {
-            onThingOnClickListener.onClickDeleteItem(position)
-        }
+
     }
 
     override fun getItemCount(): Int {

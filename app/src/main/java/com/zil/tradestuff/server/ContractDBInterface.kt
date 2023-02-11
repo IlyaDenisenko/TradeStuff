@@ -12,7 +12,7 @@ interface ContractDBInterface {
 
     fun getThingsByUserFromDB(userId: String, callbackServerData: CallbackServerData): List<ThingModel>
 
-    fun deleteFromDB(thingModel: ThingModel, callbackServerData: CallbackServerData)
+    fun deleteFromDB(thingModel: ThingModel)
 
     fun deleteByIdFromDB(id: Int)
 

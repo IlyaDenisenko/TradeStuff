@@ -8,7 +8,6 @@ import androidx.activity.result.ActivityResultLauncher
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -16,17 +15,11 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.zil.tradestuff.common.MyApp
 import com.zil.tradestuff.databinding.ActivityMainBinding
 import com.zil.tradestuff.model.ThingViewModel
-import com.zil.tradestuff.ui.account.AccountFragment
-import com.zil.tradestuff.ui.dashboard.DashboardFragment
-import com.zil.tradestuff.ui.favorite.FavoriteFragment
-import com.zil.tradestuff.ui.message.MessageFragment
-import com.zil.tradestuff.ui.publication.PublicationFragment
-import io.grpc.internal.MessageFramer
 
 class MainActivity : AppCompatActivity(){
 
@@ -35,7 +28,6 @@ class MainActivity : AppCompatActivity(){
 
     private lateinit var botNavView: BottomNavigationView
     private lateinit var thingViewModel: ThingViewModel
-    private lateinit var auth: FirebaseAuth
     private var itemId: Int = 0
     private lateinit var backStackEntry: NavBackStackEntry
     companion object{
@@ -43,6 +35,9 @@ class MainActivity : AppCompatActivity(){
         lateinit var navController: NavController
     }
 
+    object SingletonFirebaseStorage {
+        val getFirebaseStorage = FirebaseStorage.getInstance()
+    }
 
     val authActivityLauncher : ActivityResultLauncher<Intent?> = registerForActivityResult(AuthWindowContract()) { result ->
             if(result == 1) {
@@ -70,13 +65,12 @@ class MainActivity : AppCompatActivity(){
         setContentView(binding.root)
 
         botNavView = binding.bottomNavView
-        auth = FirebaseAuth.getInstance()
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         navController = navHostFragment.findNavController()
 
         botNavView.setupWithNavController(navController)
-      //  checkAuth()
+        checkAuth()
         onNavigationBottomItemSelect()
     }
 
@@ -105,20 +99,21 @@ class MainActivity : AppCompatActivity(){
             try {
                 backStackEntry = navController.getBackStackEntry(itemId)
                 navController.navigate(itemId, null, navigationOption())
+                Log.i("marco", "BQ navController count: " + backQueue.size)
 
                     if (!backQueue.contains(backStackEntry)){
                         return@setOnItemSelectedListener true
                     }
                     else{
                         backQueue.remove(backStackEntry)
-                        supportFragmentManager.findFragmentById(itemId)
-                            ?.let { it1 -> supportFragmentManager.beginTransaction().remove(it1) }
-                        Log.i("marco", supportFragmentManager.backStackEntryCount.toString())
+                        Log.i("marco", "BS fragment manager count: " + supportFragmentManager.backStackEntryCount.toString())
                     }
-
             } catch (e: IllegalArgumentException) {
                 navController.navigate(itemId, null, navigationOption())
+                Log.i("marco", "BQ navController count: " + backQueue.toList())
             }
+
+
             for (i in 1..backQueue.size )
                 Log.i("legend", backQueue[i-1].destination.displayName)
 
@@ -148,10 +143,11 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun checkAuth(){
-        if (auth.currentUser == null){
-            authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
+        if (MyApp.getFirebaseAuth().currentUser == null){
+           // authActivityLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().build())
+            Toast.makeText(this, "Sign up or Sign in", Toast.LENGTH_LONG).show()
         } else{
-            Toast.makeText(this, "Welcome " + auth.currentUser?.displayName, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Welcome " + MyApp.getFirebaseAuth().currentUser?.displayName, Toast.LENGTH_LONG).show()
         }
     }
 }

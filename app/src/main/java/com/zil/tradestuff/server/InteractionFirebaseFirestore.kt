@@ -3,6 +3,7 @@ package com.zil.tradestuff.server
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.zil.tradestuff.common.MyApp
 import com.zil.tradestuff.model.ThingModel
 
 class InteractionFirebaseFirestore: ContractDBInterface {
@@ -10,14 +11,13 @@ class InteractionFirebaseFirestore: ContractDBInterface {
     var listAllThings: MutableList<ThingModel> = mutableListOf()
     var listUserThings: MutableList<ThingModel> = mutableListOf()
     val firebaseFirestore = FirebaseFirestore.getInstance()
-    val firebaseAuth = FirebaseAuth.getInstance()
 
     val docRefAll = firebaseFirestore
         .collectionGroup("Things")
     /**Ссылка для добавления товара в БД*/
-    val docRef = FirebaseFirestore.getInstance()
+    val docRef = firebaseFirestore
         .collection("Publication")
-        .document(firebaseAuth.uid!!)
+        .document(MyApp.getFirebaseAuth().uid.toString())
         .collection("Things")
 
 
@@ -63,9 +63,8 @@ class InteractionFirebaseFirestore: ContractDBInterface {
         return listUserThings
     }
 
-    override fun deleteFromDB(thingModel: ThingModel, callbackServerData: ContractDBInterface.CallbackServerData) {
+    override fun deleteFromDB(thingModel: ThingModel) {
         docRef.document(thingModel.name).delete()
-        callbackServerData.actionAfterComingData()
     }
 
     override fun deleteByIdFromDB(id: Int) {

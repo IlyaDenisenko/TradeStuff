@@ -1,14 +1,5 @@
 package com.zil.tradestuff.model
 
-import android.net.Uri
-import android.os.Parcel
-import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.zil.tradestuff.dao.ImagesConverter
-
 import java.util.*
 
 //@Entity(tableName = TABLE_NAME)
@@ -19,6 +10,7 @@ data class ThingModel(
     val id: Int,
     //@ColumnInfo(name = "thingImages")
     val userId: String?,
+    val userName: String?,
     val images: List<String>,
   //  @ColumnInfo(name = "thingName")
     val name: String,
@@ -30,5 +22,5 @@ data class ThingModel(
         const val TABLE_NAME = "things_table"
         const val DATABASE_THINGS_NAME = "database_things"
     }
-    constructor() : this(0, "user", listOf(), "Name","Description",  Date())
+    constructor() : this(0, "user", "userName", listOf(), "Name","Description",  Date())
 }

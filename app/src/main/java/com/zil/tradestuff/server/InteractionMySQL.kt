@@ -28,7 +28,7 @@ class InteractionMySQL(context: Context): ContractDBInterface {
         TODO("Not yet implemented")
     }
 
-    override fun deleteFromDB(thingModel: ThingModel, callbackServerData: ContractDBInterface.CallbackServerData) {
+    override fun deleteFromDB(thingModel: ThingModel) {
         TODO("Not yet implemented")
     }
 
