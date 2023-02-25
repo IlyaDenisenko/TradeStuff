@@ -9,7 +9,7 @@ import java.io.File
 class InteractionFirebaseStorage: ContractDBInterface {
 
     val firebaseStorage = FirebaseStorage.getInstance()
-    val storageReference = firebaseStorage.getReference("photo_thing").child(MyApp.getFirebaseAuth().uid!!)
+    val storageReference = firebaseStorage.getReference("photo_thing").child(MyApp.getFirebaseAuth().uid.toString())
 
     override fun insertInDB(thingModel: ThingModel) {
         for (n in 0 until thingModel.images.size) {

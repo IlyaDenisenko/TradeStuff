@@ -4,13 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.MainThread
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -20,6 +24,13 @@ import com.google.firebase.storage.FirebaseStorage
 import com.zil.tradestuff.common.MyApp
 import com.zil.tradestuff.databinding.ActivityMainBinding
 import com.zil.tradestuff.model.ThingViewModel
+import com.zil.tradestuff.ui.account.AccountFragment
+import com.zil.tradestuff.ui.dashboard.DashboardFragment
+import com.zil.tradestuff.ui.favorite.FavoriteFragment
+import com.zil.tradestuff.ui.message.MessageFragment
+import com.zil.tradestuff.ui.publication.PublicationFragment
+import java.util.*
+import kotlin.collections.ArrayDeque
 
 class MainActivity : AppCompatActivity(){
 
@@ -30,6 +41,9 @@ class MainActivity : AppCompatActivity(){
     private lateinit var thingViewModel: ThingViewModel
     private var itemId: Int = 0
     private lateinit var backStackEntry: NavBackStackEntry
+    private lateinit var backQueue: ArrayDeque<NavBackStackEntry>
+    private var addToBackStack = true
+    private lateinit var fragmentBackStack: Stack<Int>
     companion object{
         var firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
         lateinit var navController: NavController
@@ -71,74 +85,52 @@ class MainActivity : AppCompatActivity(){
 
         botNavView.setupWithNavController(navController)
         checkAuth()
-        onNavigationBottomItemSelect()
+        defaultNavigation()
     }
 
-    private fun navigationOption(): NavOptions {
-        return NavOptions.Builder()
-            .setRestoreState(false)
-            .build()
-    }
-    private lateinit var previousFragment : Fragment
-
-    private fun replaceFragment(fragment: Fragment){
-        val manager = supportFragmentManager
-        manager.beginTransaction()
-            .replace(R.id.nav_host_fragment_activity_main, fragment)
-            .addToBackStack(null)
-            .commit()
-        previousFragment = fragment
-
-    }
-
-    private fun onNavigationBottomItemSelect(){
-        val backQueue = navController.backQueue
-
-        botNavView.setOnItemSelectedListener {
-            itemId = it.itemId
-            try {
-                backStackEntry = navController.getBackStackEntry(itemId)
-                navController.navigate(itemId, null, navigationOption())
-                Log.i("marco", "BQ navController count: " + backQueue.size)
-
-                    if (!backQueue.contains(backStackEntry)){
-                        return@setOnItemSelectedListener true
+    private fun defaultNavigation(){
+        fragmentBackStack = Stack()
+        navController.addOnDestinationChangedListener(object : NavController.OnDestinationChangedListener{
+            override fun onDestinationChanged(
+                controller: NavController,
+                destination: NavDestination,
+                arguments: Bundle?
+            ) {
+                if(addToBackStack){
+                    if(!fragmentBackStack.contains(destination.id)){
+                        fragmentBackStack.add(destination.id)
+                    } else if(fragmentBackStack.contains(destination.id)){
+                        if (destination.id == R.id.navigation_dashboard){
+                            val homeCount = Collections.frequency(fragmentBackStack, R.id.navigation_dashboard)
+                            if (homeCount < 2){
+                                fragmentBackStack.push(destination.id)
+                            } else{
+                                fragmentBackStack.asReversed().remove(destination.id)
+                                fragmentBackStack.push(destination.id)
+                            }
+                        }else {
+                            fragmentBackStack.remove(destination.id)
+                            fragmentBackStack.push(destination.id)
+                        }
                     }
-                    else{
-                        backQueue.remove(backStackEntry)
-                        Log.i("marco", "BS fragment manager count: " + supportFragmentManager.backStackEntryCount.toString())
-                    }
-            } catch (e: IllegalArgumentException) {
-                navController.navigate(itemId, null, navigationOption())
-                Log.i("marco", "BQ navController count: " + backQueue.toList())
+                }
+                addToBackStack = true
             }
-
-
-            for (i in 1..backQueue.size )
-                Log.i("legend", backQueue[i-1].destination.displayName)
-
-            /*when(it.itemId){
-                R.id.navigation_dashboard -> replaceFragment(DashboardFragment())
-                R.id.navigation_favorite -> replaceFragment(FavoriteFragment())
-                R.id.navigation_publication -> replaceFragment(PublicationFragment())
-                R.id.navigation_message -> replaceFragment(MessageFragment())
-                R.id.navigation_account -> replaceFragment(AccountFragment())
-            }*/
-            return@setOnItemSelectedListener true
-        }
+        })
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-//        try{
-//            backStackEntry = navController.getBackStackEntry(itemId)
-//            navController.backQueue.remove(backStackEntry)
-//            Toast.makeText(this, "work", Toast.LENGTH_SHORT).show()
-//        }
-//        catch (e: IllegalArgumentException){
-//            Toast.makeText(this, "don't work", Toast.LENGTH_SHORT).show() }
-        if (navController.backQueue.size == 1){
-            finish()
+        if (::fragmentBackStack.isInitialized && fragmentBackStack.size > 1){
+            fragmentBackStack.pop()
+            val fragmentId = fragmentBackStack.lastElement()
+            addToBackStack = false
+            navController.navigate(fragmentId)
+        }else{
+            if (::fragmentBackStack.isInitialized && fragmentBackStack.size == 1){
+                finish()
+            } else{
+                super.onBackPressed()
+            }
         }
     }
 
