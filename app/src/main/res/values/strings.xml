@@ -18,5 +18,7 @@
     <string name="login_or_reg">Login or registration</string>
     <string name="button_write_message">Write message</string>
     <string name="button_delete_thing">Delete</string>
+    <string name="edit_text_name_of_thing_empty">The name cannot be empty</string>
 
+    <string name="text_photo_count"> %1d / %2d</string>
 </resources>

@@ -18,5 +18,7 @@
     <string name="login_or_reg">Войдите или зарегистрируйтесь</string>
     <string name="button_write_message">Написать</string>
     <string name="button_delete_thing">Удалить</string>
+    <string name="edit_text_name_of_thing_empty">Имя не может быть пустым</string>
 
+    <string name="text_photo_count">%1d / %2d</string>
 </resources>

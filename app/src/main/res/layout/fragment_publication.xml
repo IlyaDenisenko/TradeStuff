@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.publication.PublicationFragment">
+    tools:context=".presentation.ui.publication.PublicationFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.zil.tradestuff.LoginOrRegistrationFragment"
+        android:name="com.zil.tradestuff.presentation.LoginOrRegistrationFragment"
         android:visibility="gone" />
 
 

@@ -2,9 +2,12 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="thing_name_text_size">20sp</dimen>
-    <dimen name="thing_desc_text_size">17sp</dimen>
+    <dimen name="photo_count_margin_bottom">20dp</dimen>
+    <dimen name="thing_dashboard_name_text_size">20sp</dimen>
+    <dimen name="thing_desc_text_size">20sp</dimen>
+    <dimen name="thing_desc_name_text_size">22sp</dimen>
     <dimen name="size_message_text">18sp</dimen>
+    <dimen name="size_photo_count">15sp</dimen>
 
     <dimen name="bottom_navigation_view_height">0.085</dimen>
 </resources>

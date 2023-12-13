@@ -4,14 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.account.AccountFragment">
+    tools:context=".presentation.ui.account.AccountFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_account_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        android:name="com.zil.tradestuff.LoginOrRegistrationFragment" />
+        android:name="com.zil.tradestuff.presentation.LoginOrRegistrationFragment" />
+
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/user_icon"
+        android:textSize="@dimen/size_message_text"
+        android:textColor="@color/black"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/user_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerHorizontal="true"
+        style="@style/roundedImageViewRounded"
+        android:src="@drawable/ic_baseline_face_24"/>
 
     <Button
         android:id="@+id/butExitAccount"

@@ -2,29 +2,34 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/nav_dashboard"
         android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_my_things" />
+        android:title="@string/title_my_things"
+        android:menuCategory="secondary"/>
 
     <item
-        android:id="@+id/navigation_favorite"
+        android:id="@+id/nav_favorite"
         android:icon="@drawable/ic_baseline_favorite_24"
-        android:title="@string/title_favorite" />
+        android:title="@string/title_favorite"
+        android:menuCategory="secondary"/>
 
     <item
-        android:id="@+id/navigation_publication"
+        android:id="@+id/nav_publication"
         android:icon="@drawable/ic_baseline_add_24"
-        android:title="@string/title_publication" />
+        android:title="@string/title_publication"
+        android:menuCategory="secondary"/>
 
     <item
-        android:id="@+id/navigation_message"
+        android:id="@+id/nav_message"
         android:icon="@drawable/ic_baseline_message_24"
-        android:title="@string/title_message" />
+        android:title="@string/title_message"
+        android:menuCategory="secondary"/>
 
     <item
-        android:id="@+id/navigation_account"
+        android:id="@+id/nav_account"
         android:icon="@drawable/ic_baseline_account_box_24"
-        android:title="@string/title_account" />
+        android:title="@string/title_account"
+        android:menuCategory="secondary"/>
 
 
 </menu>
