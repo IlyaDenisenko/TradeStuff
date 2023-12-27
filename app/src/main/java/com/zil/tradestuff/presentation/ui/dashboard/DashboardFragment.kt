@@ -1,5 +1,6 @@
 package com.zil.tradestuff.presentation.ui.dashboard
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.gms.tasks.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.zil.tradestuff.presentation.MainActivity
 import com.zil.tradestuff.R
@@ -40,10 +42,11 @@ class DashboardFragment : Fragment(), OnThingClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var floatingBut : FloatingActionButton
     private lateinit var progressBar: ProgressBar
-    private var adapter = BoardOfThingsRecyclerAdapter(mutableListOf(), this)
+    private var adapter = BoardOfThingsRecyclerAdapter(mutableListOf(), mutableListOf(), this)
 
     private var idSelectedThing = 0
     var listThings: MutableList<ThingModel> = mutableListOf()
+    var listPhotoUri: MutableList<Task<Uri>> = mutableListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +63,6 @@ class DashboardFragment : Fragment(), OnThingClickListener {
         recyclerView = binding.thingsRecycler
         floatingBut = binding.floatingBut
         progressBar = binding.progressBar
-        progressBar.visibility = View.VISIBLE
 
         initRecycler()
         uiScope.launch {
@@ -89,17 +91,28 @@ class DashboardFragment : Fragment(), OnThingClickListener {
     suspend fun getDataFromViewModel(){
         dashboardViewModel.getAllData().collect{ state ->
             when(state){
-                is State.Loading ->  progressBar.visibility = View.VISIBLE
-
+                is State.Loading ->
+                    if (listThings.size == 0)
+                        progressBar.visibility = View.VISIBLE
+                is State.Success -> listThings = state.data
+                is State.Failed -> Toast.makeText(requireContext(), "failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+        for (thing in listThings)
+            dashboardViewModel.getListPhotosByItem(thing).collect{state ->
+            when(state){
+                is State.Loading -> Log.i("TAG","loading photo")
                 is State.Success -> {
-                    listThings = state.data
-                    adapter.listThings = listThings
-                    adapter.notifyDataSetChanged()
+                    listPhotoUri.add(state.data[0])
                     progressBar.visibility = View.GONE
                 }
                 is State.Failed -> Toast.makeText(requireContext(), "failed", Toast.LENGTH_SHORT).show()
             }
         }
+        adapter.listThings = listThings
+        adapter.listPhotoUri = listPhotoUri
+        adapter.notifyDataSetChanged()
+        progressBar.visibility = View.GONE
     }
 
     private fun clickFloatingBut(){

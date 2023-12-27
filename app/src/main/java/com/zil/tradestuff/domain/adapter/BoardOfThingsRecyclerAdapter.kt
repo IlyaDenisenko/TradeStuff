@@ -1,29 +1,23 @@
 package com.zil.tradestuff.domain.adapter
 
 
-import android.content.Context
-import android.util.Log
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.zil.tradestuff.presentation.MainActivity
-
+import com.google.android.gms.tasks.Task
 import com.zil.tradestuff.R
-import com.zil.tradestuff.dao.ImagesConverter
-import com.zil.tradestuff.domain.MyApp
 import com.zil.tradestuff.domain.model.ThingModel
 import kotlinx.coroutines.*
-import java.io.File
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
-import kotlin.coroutines.coroutineContext
 
-class BoardOfThingsRecyclerAdapter(var listThings : MutableList<ThingModel>, onThingClickListener: OnThingClickListener):
+class BoardOfThingsRecyclerAdapter(var listThings : MutableList<ThingModel>, var listPhotoUri: MutableList<Task<Uri>>, onThingClickListener: OnThingClickListener):
     RecyclerView.Adapter<BoardOfThingsRecyclerAdapter.MyViewHolder>(){
 
 
@@ -52,34 +46,21 @@ class BoardOfThingsRecyclerAdapter(var listThings : MutableList<ThingModel>, onT
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        val photoUri = listPhotoUri[position]
         val thingModel = listThings[position]
         val dateFormat = SimpleDateFormat("dd-MM-yyyy hh:mm")
         val stringDate = dateFormat.format(listThings[position].date)
 
     if (thingModel.images.isNotEmpty())
-        myCoroutineScope.launch() {
-            val def = async(Dispatchers.IO) {
-                MyApp.firebaseStorage.getFirebaseStorage()
-                    .getReference("photo_thing")
-                    .child(thingModel.userId.toString())
-                    .child(thingModel.name)
-                    .child(File(ImagesConverter.fromStringToUri(thingModel.images)[0].path.toString()).name)
-                    .downloadUrl
-            }
-
-            def.await().addOnSuccessListener {
-                    Log.i("LogLoadingImage", "Holder${position} loaded")
-                    Glide.with(holder.itemView.context)
-                        .load(it)
-                        .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                        .error(R.drawable.nofoto)
-                        .into(holder.photoImage!!)
-            }
-            def.await().addOnFailureListener {
-                Log.i("LogLoadingImage", it.message.toString())
-            }
+        myCoroutineScope.launch {
+            Glide.with(holder.itemView.context)
+                .load(photoUri.await())
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .error(R.drawable.nofoto)
+                .into(holder.photoImage!!)
         }
+
 
         holder.nameText?.text = listThings[position].name
         holder.dateText?.text = stringDate

@@ -19,21 +19,17 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
 import androidx.recyclerview.widget.SnapHelper
 import com.google.android.gms.tasks.Task
-import com.google.firebase.storage.StorageReference
 import com.zil.tradestuff.presentation.MainActivity
 import com.zil.tradestuff.R
 import com.zil.tradestuff.State
-import com.zil.tradestuff.dao.ImagesConverter
 import com.zil.tradestuff.domain.adapter.DescriptionThingRecyclerAdapter
 import com.zil.tradestuff.domain.MyApp
 import com.zil.tradestuff.databinding.FragmentThingBinding
 import com.zil.tradestuff.domain.model.ThingModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.io.File
 
 class ThingFragment : Fragment(){
 
@@ -91,7 +87,6 @@ class ThingFragment : Fragment(){
         photoCount = binding.countPhotoText
         recyclerView = binding.photoRecyclerView
 
-        progressBar.visibility = View.VISIBLE
         clickDeleteButton()
         initRecycler()
 
@@ -117,12 +112,11 @@ class ThingFragment : Fragment(){
         viewModel.getThingsByUser(userIdSelectedThingParam).collect{ state ->
 
             when(state){
-                is State.Loading -> progressBar.visibility = View.VISIBLE
+                is State.Loading -> Log.i("marco", "Photos is loading")
                 is State.Success -> {
                     listThing = state.data
                     Log.i("checkFragmentResult", "List things " + listThing.size)
 
-                    progressBar.visibility = View.GONE
                     thing = listThing.find { it.id == idThingParam }!!
 
                     if (MyApp.firebaseAuth.getFirebaseAuth().uid == thing.userId)
@@ -130,20 +124,21 @@ class ThingFragment : Fragment(){
                     nameTextView.text = thing.name
                     descTextView.text = thing.description
                     userNameTextView.text = thing.userName
-                    /*adapter.thing = thing
-                    Log.i("marco", File(ImagesConverter.fromStringToUri(thing.images)[1].path.toString()).name)*/
                 }
                 is State.Failed -> Toast.makeText(requireContext(), "failed", Toast.LENGTH_SHORT).show()
             }
         }
         viewModel.getListPhotosByItem(thing).collect{state ->
             when (state){
-                is State.Loading -> Log.i("marco", "Photos is loading")
+                is State.Loading ->
+                    if (listPhotos.isEmpty())
+                    progressBar.visibility = View.VISIBLE
                 is State.Success -> {
                     listPhotos = state.data
                     adapter.thing = listPhotos
                     adapter.notifyDataSetChanged()
                     photoCount.text = getString(R.string.text_photo_count, currentPhotoNumber + 1, listPhotos.size)
+                    progressBar.visibility = View.GONE
                     Log.i("marco", listPhotos.get(0).await().toString())
                 }
                 is State.Failed -> Log.i("marco", "Loading is failed")
